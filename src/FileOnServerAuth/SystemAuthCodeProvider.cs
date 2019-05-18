@@ -29,7 +29,6 @@ namespace Dazinator.FileOnServerAuth
 
             CreateAuthCodeFileIfNotExists();
 
-
         }
 
 
@@ -50,7 +49,7 @@ namespace Dazinator.FileOnServerAuth
                     authCodeBuilder.Append(GenerateLetter(random));
                 }
 
-                System.IO.File.WriteAllText(this.PhysicalFilePath, authCodeBuilder.ToString());
+                File.WriteAllText(this.PhysicalFilePath, authCodeBuilder.ToString());
             }
         }
 
@@ -65,8 +64,6 @@ namespace Dazinator.FileOnServerAuth
         public bool CheckIsValidCode(string code)
         {
             var fileInfo = _fileProvider.GetFileInfo(_options.AuthCodeFilePath);
-
-            //  var file = _environment.ContentRootFileProvider.GetFileInfo(_options.AuthCodeFilePath);
             if (fileInfo.Exists)
             {
                 using (var reader = new StreamReader(fileInfo.CreateReadStream()))

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 
 namespace Dazinator.FileOnServerAuth
 {

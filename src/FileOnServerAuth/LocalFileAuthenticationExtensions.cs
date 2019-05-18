@@ -13,7 +13,8 @@ namespace Dazinator.FileOnServerAuth
         {
             services.Configure<AuthCodeOptions>(configureOptions);
             services.ConfigureOptions<AuthCodeOptionsPostConfigureOptions>();
-            services.AddSingleton<SystemAuthCodeProvider>((sp) => {
+            services.AddSingleton<SystemAuthCodeProvider>((sp) =>
+            {
                 var options = sp.GetRequiredService<IOptions<AuthCodeOptions>>();
                 var fp = new PhysicalFileProvider(options.Value.PhysicalRootPath);
                 return Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<SystemAuthCodeProvider>(sp, fp);
@@ -22,12 +23,13 @@ namespace Dazinator.FileOnServerAuth
         }
 
         public static IServiceCollection AddLocalFileAuthentication(
-            this IServiceCollection services,           
+            this IServiceCollection services,
            IConfiguration config)
         {
             services.Configure<AuthCodeOptions>(config);
             services.ConfigureOptions<AuthCodeOptionsPostConfigureOptions>();
-            services.AddSingleton<SystemAuthCodeProvider>((sp)=> {
+            services.AddSingleton<SystemAuthCodeProvider>((sp) =>
+            {
                 var options = sp.GetRequiredService<IOptions<AuthCodeOptions>>();
                 var fp = new PhysicalFileProvider(options.Value.PhysicalRootPath);
                 return Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<SystemAuthCodeProvider>(sp, fp);
