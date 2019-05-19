@@ -12,6 +12,7 @@
   </ItemGroup> 
 
   <ItemGroup>
+    <ProjectReference Include="..\FileOnServerAuth.Shared\FileOnServerAuth.Shared.csproj" />
     <ProjectReference Include="..\FileOnServerAuth\FileOnServerAuth.csproj" />
   </ItemGroup>
 

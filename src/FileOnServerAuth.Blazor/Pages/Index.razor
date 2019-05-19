@@ -1,0 +1,16 @@
+﻿@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+
+
+<TemplatedDialog Show="@ShowLogin">
+    <Dazinator.FileOnServerAuth.Blazor.Components.Login  />
+</TemplatedDialog>
+
+
+@functions {
+    public bool ShowLogin { get; set; } = true;  
+}

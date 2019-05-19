@@ -1,42 +1,35 @@
-﻿using Dazinator.FileOnServerAuth;
+using Dazinator.FileOnServerAuth;
+using FileOnServerAuth.Blazor.Sample.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Linq;
 
-namespace FileOnServerAuth.Mvc.Sample
+namespace BlazorNew.Server
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        private readonly IWebHostEnvironment environment;
+
+        public Startup(IWebHostEnvironment environment)
         {
-            Configuration = configuration;
-            Environment = environment;
-        }
-
-        public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
-
+            this.environment = environment;
+        } 
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
 
             services.AddLocalFileAuthentication((options) =>
             {
                 options.AuthCodeFilePath = "localfileauth.txt";
                 options.Length = 10;
-                options.PhysicalRootPath = Environment.ContentRootPath;
+                options.PhysicalRootPath = environment.ContentRootPath;
             });
 
             services.AddAuthentication(options =>
@@ -48,46 +41,52 @@ namespace FileOnServerAuth.Mvc.Sample
                 .AddFileOnServerAuthenticationMvc("TestLocalFile", "Server", (a) =>
                 {
                     a.LoginExpiresAfter = new System.TimeSpan(0, 0, 60);
-                   // a.AuthenticationType = "TestLocalFile";
+                    // a.AuthenticationType = "TestLocalFile";
                 }, (cookieOptions) =>
                 {
-                    
+
                 });
 
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            services.AddMvc().AddNewtonsoftJson();
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                     new[] { "application/octet-stream" });
             });
+
+            services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-CSRF-TOKEN";
+            });
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseResponseCompression();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseBlazorDebugging();
             }
 
             app.UseStaticFiles();
 
+            app.UseRouting();
+
+            app.UseMiddleware<CsrfTokenCookieMiddleware>();
+
             app.UseAuthentication();
 
-            app.UseCookiePolicy();
-
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-        }
+                endpoints.MapDefaultControllerRoute();
+            });         
+
+            app.UseBlazor<Dazinator.FileOnServerAuth.Blazor.Startup>();
+        }      
     }
 }

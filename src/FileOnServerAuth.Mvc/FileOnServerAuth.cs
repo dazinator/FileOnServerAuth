@@ -9,17 +9,18 @@ using System.Threading.Tasks;
 
 namespace Dazinator.FileOnServerAuth.Mvc
 {
-    public class FileOnServerAuthController : Controller
+    [Route("api/[controller]")]
+    public class FileOnServerAuth : Controller
     {
 
         private readonly ILogger<FileOnServerAuthController> _logger;
         private readonly IClaimsPrincipalFactory _principalFactory;
-       // private readonly IOptions<AuthCodeOptions> _options;
+        // private readonly IOptions<AuthCodeOptions> _options;
         private readonly IOptions<FileOnServerAuthenticationOptions> _authCodePolicy;
         private readonly IAuthorizationService _authService;
         private readonly SystemAuthCodeProvider _authCodeProvider;
 
-        public FileOnServerAuthController(
+        public FileOnServerAuth(
             ILogger<FileOnServerAuthController> logger,
             IClaimsPrincipalFactory prinipalFactory,
             IAuthorizationService authService,
@@ -32,37 +33,15 @@ namespace Dazinator.FileOnServerAuth.Mvc
             _authService = authService;
             _authCodeProvider = authCodeProvider;
             _authCodePolicy = policy;
-        }
-
-        // [Authorize(AuthenticationSchemes = AuthCodeOptions.DefaultAuthenticationSchemeName)]
-        public async Task<IActionResult> Index()
-        {
-
-            var result = await _authService.AuthorizeAsync(this.User, _authCodePolicy.Value.Policy);
-            if (!result.Succeeded)
-            {
-                return Challenge(_authCodePolicy.Value.AuthenticationScheme);
-            }
-
-            // If already authenticated with system authentication, redirect to home page.
-            var values = new { Controller = "", Action = "" };
-            return RedirectToRoute("default", values);
-        }
-
-        [HttpGet]
-        public IActionResult Login(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            ViewData["AuthCodeFilePath"] = _authCodeProvider.PhysicalFilePath;
-            var model = new AuthenticateViewModel();
-            return View(model);
-        }
+        }     
+       
 
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([FromForm]AuthenticateViewModel authItem, string returnUrl)
+        public async Task<IActionResult> Login(AuthenticateViewModel authItem)
         {
+            var returnUrl = "/";
             if (ModelState.IsValid)
             {
                 // compare the code.
@@ -75,9 +54,10 @@ namespace Dazinator.FileOnServerAuth.Mvc
 
                         // need to set a temporary system login.
                         var authProps = new AuthenticationProperties();
-                        authProps.ExpiresUtc = DateTime.UtcNow.Add(_authCodePolicy.Value.LoginExpiresAfter);                           
+                        authProps.ExpiresUtc = DateTime.UtcNow.Add(_authCodePolicy.Value.LoginExpiresAfter);
 
                         await HttpContext.SignInAsync(_authCodePolicy.Value.AuthenticationScheme, sysIdentity, authProps);
+                     //   return Json(new { Status = "Success" };
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -88,7 +68,7 @@ namespace Dazinator.FileOnServerAuth.Mvc
             var newModel = new AuthenticateViewModel();
             ViewData["AuthCodeFilePath"] = _authCodeProvider.PhysicalFilePath;
             ViewData["ReturnUrl"] = returnUrl;
-            return View(authItem);
+            return Json(authItem);
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

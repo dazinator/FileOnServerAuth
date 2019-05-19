@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Dazinator.FileOnServerAuth
+namespace Dazinator.FileOnServerAuth.Shared
 {
     public class AuthenticateViewModel
     {

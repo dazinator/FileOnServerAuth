@@ -1,0 +1,82 @@
+﻿@inject HttpClient HttpClient
+@inject IUriHelper UriHelper
+@inject IBrowserCookieService BrowserCookieService;
+
+
+<div class="dialog-title">
+    <h2>Login as Platform Administrator</h2>
+    <p>
+        A file has been created in the following location on the web server.
+        Please enter the authentication code within it below.
+    </p>
+</div>
+<form class="dialog-body">
+    <div class="form-group">
+        <label for="Code" class="control-label">Code</label>
+        <input for="Code" class="form-control" bind="@ViewModel.Code" />
+    </div>
+
+
+</form>
+
+<div class="dialog-buttons">
+    <button class="btn btn-secondary mr-auto" onclick="@OnCancel">Cancel</button>
+    <span class="mr-center">
+        Price: <span class="price">1.00</span>
+    </span>
+    <button class="btn btn-success ml-auto" onclick="@OnLogin">Login ></button>
+</div>
+
+@functions {
+
+    [Parameter] AuthenticateViewModel ViewModel { get; set; } = new AuthenticateViewModel();
+    [Parameter] EventCallback OnCancel { get; set; }
+    // [Parameter] EventCallback OnLogin { get; set; }
+
+    async Task OnLogin()
+    {
+        string csrfCookieValue = await BrowserCookieService.GetCookie("CSRF-TOKEN");
+        if (csrfCookieValue != null)
+        {
+            if (HttpClient.DefaultRequestHeaders.Contains("X-CSRF-TOKEN"))
+            {
+                HttpClient.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+            }
+            HttpClient.DefaultRequestHeaders.Add("X-CSRF-TOKEN", csrfCookieValue);
+        }
+
+
+        await HttpClient.PostJsonAsync("api/FileOnServerAuth/Login", ViewModel);
+       
+      //  result.
+      // go to return url
+        UriHelper.NavigateTo("");
+    }
+
+    //protected async override Task OnInitAsync()
+    //{
+    //    toppings = await HttpClient.GetJsonAsync<List<Topping>>("toppings");
+    //}
+
+    //void ToppingSelected(UIChangeEventArgs e)
+    //{
+    //    if (int.TryParse((string)e.Value, out var index) && index >= 0)
+    //    {
+    //        AddTopping(toppings[index]);
+    //    }
+    //}
+
+    //void AddTopping(Topping topping)
+    //{
+    //    if (Pizza.Toppings.Find(pt => pt.Topping == topping) == null)
+    //    {
+    //        Pizza.Toppings.Add(new PizzaTopping() { Topping = topping });
+    //    }
+    //}
+
+    //void RemoveTopping(Topping topping)
+    //{
+    //    Pizza.Toppings.RemoveAll(pt => pt.Topping == topping);
+    //    StateHasChanged();
+    //}
+}
