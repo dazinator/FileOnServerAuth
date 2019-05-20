@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Dazinator.FileOnServerAuth.Mvc</AssemblyName>
+    <RootNamespace>Dazinator.FileOnServerAuth.Mvc</RootNamespace>
   </PropertyGroup> 
 
   <ItemGroup>

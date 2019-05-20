@@ -10,6 +10,9 @@
     <RazorLangVersion>3.0</RazorLangVersion>
     <AssemblyName>Dazinator.FileOnServerAuth.Blazor</AssemblyName>
     <RootNamespace>Dazinator.FileOnServerAuth.Blazor</RootNamespace>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
