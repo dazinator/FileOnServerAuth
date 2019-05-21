@@ -1,24 +1,24 @@
+# environment variables
+environment:
+  path_to_sln: src/FileOnServerAuth.sln 
 skip_tags: true
-image: Visual Studio 2019 Preview
-environment:  
-  BENCHMARKS: on  
-
 install:
-  - cmd: choco install gitversion.portable -pre --version 4.0.1-beta1-65 -y
-  #- ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
-  - cmd: choco install dotnetcore-sdk --pre
-
+  - choco install gitversion.portable -pre -y
+  - cinst gitlink -version 2.4.1 -y
+image: Visual Studio 2019 Preview
+assembly_info:
+  patch: false
 before_build:
-  - ps: gitversion /l console /output buildserver
-
+- ps: gitversion /l console /output buildserver
+- cmd: msbuild %path_to_sln% /t:restore /p:PackageVersion=%GitVersion_FullSemVer%
 build:
-  verbosity: detailed
-build_script:
-- cmd: dotnet restore ./src/FileOnServerAuth.sln --disable-parallel
-- cmd: dotnet build ./src/FileOnServerAuth.sln -c Release --disable-parallel
-- cmd: dotnet pack ./src/FileOnServerAuth.sln -c Release --output %APPVEYOR_BUILD_FOLDER%/artifacts/
+  project: '%path_to_sln%'
+  verbosity: minimal
+after_build:
+- cmd: gitlink . -u https://github.com/%APPVEYOR_REPO_NAME% -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f %path_to_sln%
+- cmd: msbuild %path_to_sln% /t:Pack /p:PackageVersion=%GitVersion_FullSemVer%
 artifacts:
-- path: artifacts/*
+- path: /src/**/*.nupkg
 deploy:
   provider: NuGet
   api_key:
