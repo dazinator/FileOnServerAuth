@@ -16,9 +16,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             string authenticationScheme = FileOnServerAuthenticationOptions.DefaultAuthenticationSchemeName,
             string displayName = FileOnServerAuthenticationOptions.DefaultDisplayName,
-            string loginPath = LoginPathMvc,
             Action<FileOnServerAuthenticationOptions> configureOptions = null,
-            Action<CookieAuthenticationOptions> configureCookieOptions = null)
+            Action<CookieAuthenticationOptions> configureCookieOptions = null,
+            string loginPath = LoginPathMvc)
         {
             builder.Services.AddSingleton<IClaimsPrincipalFactory, ClaimsPrincipalFactory>();
             builder.Services.ConfigureOptions<AuthenticationOptionsPostConfigureOptions>();
@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 o.AuthenticationScheme = authenticationScheme;
                 configureOptions?.Invoke(o);
-            });          
+            });
 
             builder.AddCookie(authenticationScheme, displayName, (cookieOptions) =>
             {

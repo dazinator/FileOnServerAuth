@@ -1,0 +1,39 @@
+﻿@{
+    @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+    @using Dazinator.FileOnServerAuth.Shared
+    ViewData["Title"] = "Local File";
+    @model AuthenticateViewModel
+}
+<h2>Login as Platform Administrator (Custom Login View!)</h2>
+
+<p>
+    A file has been created in the following location on the web server.
+    Please enter the authentication code within it below.
+</p>
+
+<p>
+    @ViewData["AuthCodeFilePath"]
+</p>
+
+<form asp-controller="FileOnServerAuthController"
+      asp-action="Login"
+      asp-route-returnurl="@ViewData["ReturnUrl"]"
+      method="post"
+      class="form-horizontal"
+      role="form">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    @*<div class="form-group">
+        <label asp-for="AuthCodeFilePath" class="col-md-2 control-label"></label>
+    </div>*@
+    <div class="form-group">
+        <label asp-for="Code" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Code" class="form-control" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+    </div>
+
+    <input type="submit" value="Login" class="btn btn-default" />
+</form>

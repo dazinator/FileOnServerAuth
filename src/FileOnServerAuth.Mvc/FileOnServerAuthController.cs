@@ -14,8 +14,8 @@ namespace Dazinator.FileOnServerAuth.Mvc
 
         private readonly ILogger<FileOnServerAuthController> _logger;
         private readonly IClaimsPrincipalFactory _principalFactory;
-       // private readonly IOptions<AuthCodeOptions> _options;
-        private readonly IOptions<FileOnServerAuthenticationOptions> _authCodePolicy;
+        // private readonly IOptions<AuthCodeOptions> _options;
+        private readonly IOptions<FileOnServerAuthenticationOptions> _options;
         private readonly IAuthorizationService _authService;
         private readonly SystemAuthCodeProvider _authCodeProvider;
 
@@ -31,17 +31,17 @@ namespace Dazinator.FileOnServerAuth.Mvc
             _principalFactory = prinipalFactory;
             _authService = authService;
             _authCodeProvider = authCodeProvider;
-            _authCodePolicy = policy;
+            _options = policy;
         }
 
         // [Authorize(AuthenticationSchemes = AuthCodeOptions.DefaultAuthenticationSchemeName)]
         public async Task<IActionResult> Index()
         {
 
-            var result = await _authService.AuthorizeAsync(this.User, _authCodePolicy.Value.Policy);
+            var result = await _authService.AuthorizeAsync(this.User, _options.Value.Policy);
             if (!result.Succeeded)
             {
-                return Challenge(_authCodePolicy.Value.AuthenticationScheme);
+                return Challenge(_options.Value.AuthenticationScheme);
             }
 
             // If already authenticated with system authentication, redirect to home page.
@@ -55,7 +55,7 @@ namespace Dazinator.FileOnServerAuth.Mvc
             ViewData["ReturnUrl"] = returnUrl;
             ViewData["AuthCodeFilePath"] = _authCodeProvider.PhysicalFilePath;
             var model = new AuthenticateViewModel();
-            return View(model);
+            return View(_options.Value.LoginViewName, model);
         }
 
         [HttpPost]
@@ -75,9 +75,9 @@ namespace Dazinator.FileOnServerAuth.Mvc
 
                         // need to set a temporary system login.
                         var authProps = new AuthenticationProperties();
-                        authProps.ExpiresUtc = DateTime.UtcNow.Add(_authCodePolicy.Value.LoginExpiresAfter);                           
+                        authProps.ExpiresUtc = DateTime.UtcNow.Add(_options.Value.LoginExpiresAfter);
 
-                        await HttpContext.SignInAsync(_authCodePolicy.Value.AuthenticationScheme, sysIdentity, authProps);
+                        await HttpContext.SignInAsync(_options.Value.AuthenticationScheme, sysIdentity, authProps);
                         return RedirectToLocal(returnUrl);
                     }
                 }

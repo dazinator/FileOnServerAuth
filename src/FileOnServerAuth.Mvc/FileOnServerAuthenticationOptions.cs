@@ -12,6 +12,8 @@ namespace Dazinator.FileOnServerAuth.Mvc
         public const string DefaultGrantRoleNameClaim = "System Administrator";
         public const string DefaultGrantNameClaim = "System Administrator";
         public const string DefaultDisplayName = "File On Server";
+        public const string DefaultLoginViewName = "Login";
+
 
         public static TimeSpan DefaultLoginExpiresAfter = new TimeSpan(1, 0, 0);
 
@@ -26,6 +28,7 @@ namespace Dazinator.FileOnServerAuth.Mvc
         public string GrantNameClaim { get; set; } = DefaultGrantNameClaim;
         internal string AuthenticationScheme { get; set; } = DefaultAuthenticationSchemeName;
         public string AuthenticationType { get; set; } = DefaultAuthenticationType;
+        public string LoginViewName { get; set; } = DefaultLoginViewName;
 
         public TimeSpan LoginExpiresAfter { get; set; } = DefaultLoginExpiresAfter;
 
