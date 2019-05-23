@@ -2,6 +2,7 @@
 using Dazinator.FileOnServerAuth.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System;
 
@@ -15,23 +16,25 @@ namespace Microsoft.Extensions.DependencyInjection
 
             string authenticationScheme = FileOnServerAuthenticationOptions.DefaultAuthenticationSchemeName,
             string displayName = FileOnServerAuthenticationOptions.DefaultDisplayName,
+            string loginPath = LoginPathMvc,
             Action<FileOnServerAuthenticationOptions> configureOptions = null,
             Action<CookieAuthenticationOptions> configureCookieOptions = null)
         {
             builder.Services.AddSingleton<IClaimsPrincipalFactory, ClaimsPrincipalFactory>();
             builder.Services.ConfigureOptions<AuthenticationOptionsPostConfigureOptions>();
 
-            builder.Services.Configure<FileOnServerAuthenticationOptions>((o)=> {
+            builder.Services.Configure<FileOnServerAuthenticationOptions>((o) =>
+            {
                 o.AuthenticationScheme = authenticationScheme;
                 configureOptions?.Invoke(o);
-            });            
-           
+            });          
+
             builder.AddCookie(authenticationScheme, displayName, (cookieOptions) =>
             {
-                cookieOptions.LoginPath = new PathString(LoginPathMvc);
-                cookieOptions.ReturnUrlParameter = "returnUrl";               
+                cookieOptions.LoginPath = new PathString(loginPath);
+                cookieOptions.ReturnUrlParameter = "returnUrl";
                 configureCookieOptions?.Invoke(cookieOptions);
-            });        
+            });
 
             return builder;
             // return builder.<LocalFileAuthenticationOptions, LocalFileAuthenticationHandler>(authenticationScheme, displayName, configureOptions);

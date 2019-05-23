@@ -45,7 +45,7 @@ namespace FileOnServerAuth.Mvc.Sample
                 options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
                 .AddCookie()
-                .AddFileOnServerAuthenticationMvc("TestLocalFile", "Server", (a) =>
+                .AddFileOnServerAuthenticationMvc("TestLocalFile", "Server", "/FileOnServerAuth/Login", (a) =>
                 {
                     a.LoginExpiresAfter = new System.TimeSpan(0, 0, 60);
                    // a.AuthenticationType = "TestLocalFile";

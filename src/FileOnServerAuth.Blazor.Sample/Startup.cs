@@ -38,7 +38,7 @@ namespace BlazorNew.Server
                 options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
                 .AddCookie()
-                .AddFileOnServerAuthenticationMvc("TestLocalFile", "Server", (a) =>
+                .AddFileOnServerAuthenticationMvc("TestLocalFile", "Server", "/FileOnServerAuth/Login", (a) =>
                 {
                     a.LoginExpiresAfter = new System.TimeSpan(0, 0, 60);
                     // a.AuthenticationType = "TestLocalFile";
@@ -57,9 +57,7 @@ namespace BlazorNew.Server
             services.AddAntiforgery(options =>
             {
                 options.HeaderName = "X-CSRF-TOKEN";
-            });
-
-            
+            });            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,9 +75,9 @@ namespace BlazorNew.Server
 
             app.UseRouting();
 
-            app.UseMiddleware<CsrfTokenCookieMiddleware>();
+           // app.UseMiddleware<CsrfTokenCookieMiddleware>();
 
-            app.UseAuthentication();
+          //  app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {

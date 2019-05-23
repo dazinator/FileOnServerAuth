@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Dazinator.FileOnServerAuth.Mvc
 {
     [Route("api/[controller]")]
-    public class FileOnServerAuth : Controller
+    public class FileOnServerAuthApiController : Controller
     {
 
         private readonly ILogger<FileOnServerAuthController> _logger;
@@ -20,7 +20,7 @@ namespace Dazinator.FileOnServerAuth.Mvc
         private readonly IAuthorizationService _authService;
         private readonly SystemAuthCodeProvider _authCodeProvider;
 
-        public FileOnServerAuth(
+        public FileOnServerAuthApiController(
             ILogger<FileOnServerAuthController> logger,
             IClaimsPrincipalFactory prinipalFactory,
             IAuthorizationService authService,
@@ -33,8 +33,8 @@ namespace Dazinator.FileOnServerAuth.Mvc
             _authService = authService;
             _authCodeProvider = authCodeProvider;
             _authCodePolicy = policy;
-        }     
-       
+        }
+
 
         [HttpPost]
         [AllowAnonymous]
@@ -57,18 +57,19 @@ namespace Dazinator.FileOnServerAuth.Mvc
                         authProps.ExpiresUtc = DateTime.UtcNow.Add(_authCodePolicy.Value.LoginExpiresAfter);
 
                         await HttpContext.SignInAsync(_authCodePolicy.Value.AuthenticationScheme, sysIdentity, authProps);
-                     //   return Json(new { Status = "Success" };
-                        return RedirectToLocal(returnUrl);
+                        return Json(new { Status = "Success" });
+                        // return RedirectToLocal(returnUrl);
                     }
                 }
 
             }
 
-            ModelState.AddModelError("Code", "Invalid code.");
-            var newModel = new AuthenticateViewModel();
-            ViewData["AuthCodeFilePath"] = _authCodeProvider.PhysicalFilePath;
-            ViewData["ReturnUrl"] = returnUrl;
-            return Json(authItem);
+            //ModelState.AddModelError("Code", "Invalid code.");
+            //var newModel = new AuthenticateViewModel();
+            //ViewData["AuthCodeFilePath"] = _authCodeProvider.PhysicalFilePath;
+            //ViewData["ReturnUrl"] = returnUrl;
+            return Json(new { Status = "Failure" });
+          //  return Json(authItem);
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
