@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 
 namespace FileOnServerAuth.Mvc.Sample
@@ -49,10 +50,10 @@ namespace FileOnServerAuth.Mvc.Sample
                 {
                     a.LoginExpiresAfter = new System.TimeSpan(0, 0, 60);
                     a.LoginViewName = "CustomLogin";
-                   // a.AuthenticationType = "TestLocalFile";
+                    // a.AuthenticationType = "TestLocalFile";
                 }, (cookieOptions) =>
                 {
-                    
+
                 });
 
 
@@ -82,6 +83,13 @@ namespace FileOnServerAuth.Mvc.Sample
             app.UseAuthentication();
 
             app.UseCookiePolicy();
+
+            app.Use(async (c, n) =>
+            {
+                var userName = c.User?.Identity?.Name;
+                Console.WriteLine(userName);
+                await n.Invoke();
+            });
 
             app.UseMvc(routes =>
             {

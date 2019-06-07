@@ -85,10 +85,10 @@ namespace Dazinator.FileOnServerAuth.Mvc
             }
 
             ModelState.AddModelError("Code", "Invalid code.");
-            var newModel = new AuthenticateViewModel();
+            var newModel = new AuthenticateViewModel();            
             ViewData["AuthCodeFilePath"] = _authCodeProvider.PhysicalFilePath;
             ViewData["ReturnUrl"] = returnUrl;
-            return View(authItem);
+            return View(_options.Value.LoginViewName, authItem);
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
